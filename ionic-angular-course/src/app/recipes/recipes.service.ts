@@ -25,7 +25,7 @@ export class RecipesService {
     return [... this.recipes]; // copy the content of an array and put it in another array
   }
 
-  getRecie(recipeId: string){
+  getRecipe(recipeId: string){
     return {
       ... this.recipes.find( recipe => { // create a copy of the objet
       return recipe.id === recipeId;
