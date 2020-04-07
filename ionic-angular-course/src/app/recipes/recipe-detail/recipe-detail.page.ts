@@ -22,7 +22,8 @@ export class RecipeDetailPage implements OnInit {
   ngOnInit() {
     this.activatedRoute.paramMap.subscribe( paramMap => {
       if (!paramMap.has('recipeId')) {
-        //redirect
+        // redirect
+        this.router.navigate(['/recipes']); // redirect to the recipes page after the recipe is deleted
         return;
       }
       const recipeId = paramMap.get('recipeId');
