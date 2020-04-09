@@ -9,12 +9,14 @@ import { RecipesService } from './recipes.service';
 })
 
 export class RecipesPage implements OnInit {
-  recipes: Recipe[]
+  recipes: Recipe[];
 
   constructor( private recipesService: RecipesService) { }
 
   ngOnInit() {
     this.recipes = this.recipesService.getAllRecipes();
+    // Debbuging
+    console.log(this.recipes);
   }
 
 }

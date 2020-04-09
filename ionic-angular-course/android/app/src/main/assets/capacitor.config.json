@@ -1,8 +1,11 @@
 {
-  "appId": "com.udemy-course.ionic-angular",
+  "appId": "com.udemycourse.ionicangular",
   "appName": "ionic-angular-course",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",
-  "cordova": {}
+  "cordova": {},
+  "server": {
+    "url": "http://localhost:8101"
+  }
 }
