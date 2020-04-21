@@ -36,4 +36,9 @@ export class PlacesService {
 
   }
   constructor() { }
+
+  getPlace(id: string){
+    return {...this.places.find(p => p.id === id)}; // {...} return a clone of the object requested
+  }
 }
+
