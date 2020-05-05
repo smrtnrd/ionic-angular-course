@@ -20,12 +20,12 @@ export class OfferBookingsPage implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.subscribe( paramMap => {
-      if (!paramMap.has('placeId')){
+      if (!paramMap.has('placeId')) {
         this.navCtrl.navigateBack('/places/tabs/offers');
         return;
       }
       this.place = this.placesService.getPlace(paramMap.get('placeId'));
-    }); //listen the changes on the url
+    }); // listen the changes on the url
   }
 
 }
