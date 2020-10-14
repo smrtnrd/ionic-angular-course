@@ -17,4 +17,8 @@ export class OfferItemComponent implements OnInit {
     return new Date();
   }
 
+  onCreateOffer(){
+    console.log('Creating offered place ...');
+  }
+
 }

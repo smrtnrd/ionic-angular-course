@@ -25,6 +25,7 @@ export class OfferBookingsPage implements OnInit {
         return;
       }
       this.place = this.placesService.getPlace(paramMap.get('placeId'));
+      console.log('Offer Booking: PlaceID: ', paramMap.get('placeId'));
     }); // listen the changes on the url
   }
 
