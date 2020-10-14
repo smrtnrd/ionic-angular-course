@@ -26,6 +26,7 @@ export class EditOfferPage implements OnInit {
         this.navCtrl.navigateBack('/places/tabs/offers');
         return;
       }
+      // get the data from the specific id
       this.place = this.placesService.getPlace(paramMap.get('placeId'));
       console.log('PlaceID: ', paramMap.get('placeId'));
       // Reactive Form

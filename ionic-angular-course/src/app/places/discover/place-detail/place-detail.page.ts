@@ -69,8 +69,8 @@ export class PlaceDetailPage implements OnInit {
     console.log(mode);
     this.modalCtrl
       .create({
-        component: CreateBookingComponent, 
-        componentProps: {selectedPlace: this.discoverPlace}
+        component: CreateBookingComponent,
+        componentProps: {selectedPlace: this.discoverPlace, selectedMode: mode} // forward information to the new object
       })
       .then(modalEl => {
         modalEl.present();
