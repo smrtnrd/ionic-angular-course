@@ -11,7 +11,8 @@ import { NgForm } from '@angular/forms';
 export class CreateBookingComponent implements OnInit {
   @Input() selectedPlace: Place;
   @Input() selectedMode: 'select' | 'random';
-  @ViewChild('f')  form: NgForm;
+  // https://stackoverflow.com/questions/56473899/error-ts2554-expected-2-arguments-but-got-1-with-viewchild
+  @ViewChild('f', {static: true}) form: NgForm;
 
   startDate: string;
   endDate: string;
@@ -21,7 +22,7 @@ export class CreateBookingComponent implements OnInit {
     const availableFrom = new Date(this.selectedPlace.availableFrom);
     const availableTo = new Date(this.selectedPlace.availableTo);
     console.log(this.selectedMode);
-    if (this.selectedMode === 'random'){
+    if (this.selectedMode === 'random') {
       this.startDate = new Date(
           availableFrom.getTime() +
           Math.random() *
@@ -47,7 +48,7 @@ export class CreateBookingComponent implements OnInit {
 
   onBookPlace() {
     if (!this.form.valid || !this.datesValid){
-      return
+      return;
     }
     this.modalCtrl.dismiss({bookingDate:{
       firstName: this.form.value['first-name'],
