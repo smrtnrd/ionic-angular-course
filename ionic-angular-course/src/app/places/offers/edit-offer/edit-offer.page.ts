@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { PlacesService } from '../../places.service';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-edit-offer',
@@ -13,6 +14,7 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 export class EditOfferPage implements OnInit {
   place: Place;
   form: FormGroup;
+  private placesSub: Subscription;
   
   constructor(
     private route: ActivatedRoute,
@@ -26,9 +28,11 @@ export class EditOfferPage implements OnInit {
         this.navCtrl.navigateBack('/places/tabs/offers');
         return;
       }
-      // get the data from the specific id
-      this.place = this.placesService.getPlace(paramMap.get('placeId'));
-      console.log('PlaceID: ', paramMap.get('placeId'));
+      this.placesSub  = this.placesService.getPlace(paramMap.get('placeId')).subscribe(place => {
+        // get the data from the specific id
+        this.place = place;
+        console.log('PlaceID: ', paramMap.get('placeId'));
+      });
       // Reactive Form
       this.form = new FormGroup({
           title: new FormControl(this.place.title, {

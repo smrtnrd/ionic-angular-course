@@ -2,6 +2,7 @@ import { Place } from './../place.model';
 import { Component, OnInit } from '@angular/core';
 import { PlacesService } from '../places.service';
 import { MenuController } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-discover',
@@ -11,6 +12,7 @@ import { MenuController } from '@ionic/angular';
 export class DiscoverPage implements OnInit {
   loadedPlaces: Place[];
   listedLoadedPlaces: Place[];
+  private placesSub: Subscription;
 
 
   constructor(
@@ -19,8 +21,11 @@ export class DiscoverPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadedPlaces = this.placesService.places;
-    this.listedLoadedPlaces = this.loadedPlaces.slice(1);
+    this.placesSub = this.placesService.places.subscribe(places => {
+      this.loadedPlaces = places;
+      this.listedLoadedPlaces = this.loadedPlaces.slice(1);
+    });
+    
   }
 
   onOpenMenu() {

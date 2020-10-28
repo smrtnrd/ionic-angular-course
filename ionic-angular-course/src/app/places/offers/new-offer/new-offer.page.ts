@@ -1,3 +1,6 @@
+import { LoadingController } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { PlacesService } from './../../places.service';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
@@ -9,7 +12,11 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 export class NewOfferPage implements OnInit {
   form: FormGroup;
 
-  constructor() { }
+  constructor(
+    private placesService: PlacesService,
+    private router: Router,
+    private laodingCtrl: LoadingController
+  ) {}
 
   ngOnInit() {
     // Reactive Form
@@ -28,20 +35,41 @@ export class NewOfferPage implements OnInit {
       }),
       dateFrom: new FormControl(null, {
         updateOn: 'blur',
-        validators: [Validators.required]
+        validators: [Validators.required],
       }),
       dateTo: new FormControl(null, {
         updateOn: 'blur',
-        validators: [Validators.required]
-      })
+        validators: [Validators.required],
+      }),
     });
   }
 
-  onCreateOffer(){
-    if(!this.form.valid){
+  onCreateOffer() {
+    if (!this.form.valid) {
       return;
     }
-    console.log(this.form);
-  }
+    this.laodingCtrl
+      .create({
+        message: 'creating place ...',
+      })
+      .then((loadingEl) => {
+        loadingEl.present(); // open the loading modal animation
+        this.placesService
+          .addPlace(
+            this.form.value.title,
+            this.form.value.description,
+            +this.form.value.price,
+            new Date(this.form.value.dateFrom),
+            new Date(this.form.value.dateTo)
+          )
+          .subscribe(() => {
+            loadingEl.dismiss(); // close the loading modal animations
+            this.form.reset();
+            this.router.navigate(['/', 'places', 'tabs', 'offers']);
+          });
+      });
 
+    console.log('New Offer Created!!');
+    // console.log(this.form);
+  }
 }
