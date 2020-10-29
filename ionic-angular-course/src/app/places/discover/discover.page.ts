@@ -15,6 +15,7 @@ export class DiscoverPage implements OnInit, OnDestroy {
   listedLoadedPlaces: Place[];
   relevantPlaces: Place[];
   private placesSub: Subscription;
+  private chosenFilter = 'all'; // allow us to reset the filter into its original state
 
 
   constructor(
@@ -26,9 +27,17 @@ export class DiscoverPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.placesSub = this.placesService.places.subscribe(places => {
       this.loadedPlaces = places;
-      this.relevantPlaces = this.loadedPlaces;
-      this.listedLoadedPlaces = this.relevantPlaces.slice(1);
-    }); 
+      if (this.chosenFilter === 'all') {
+        this.relevantPlaces = this.loadedPlaces;
+        this.listedLoadedPlaces = this.relevantPlaces.slice(1);
+      } else {
+        this.relevantPlaces = this.loadedPlaces.filter(
+          place => place.userId !== this.authService.userId
+          // return the places not created by the user
+        );
+        this.listedLoadedPlaces = this.relevantPlaces.slice(1);
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -45,12 +54,14 @@ export class DiscoverPage implements OnInit, OnDestroy {
     if (event.detail.value === 'all') {
       this.relevantPlaces = this.loadedPlaces;
       this.listedLoadedPlaces = this.relevantPlaces.slice(1);
+      this.chosenFilter = 'all';
     } else {
       this.relevantPlaces = this.loadedPlaces.filter(
         place => place.userId !== this.authService.userId
         // return the places not created by the user
       );
       this.listedLoadedPlaces = this.relevantPlaces.slice(1);
+      this.chosenFilter = 'bookable'
     }
     console.log(event.detail);
   }
