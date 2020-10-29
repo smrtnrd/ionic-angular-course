@@ -1,6 +1,7 @@
+import { AuthService } from './../../../auth/auth.service';
 import { BookingService } from './../../../bookings/booking.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import {
   NavController,
   ModalController,
@@ -19,6 +20,7 @@ import { Subscription } from 'rxjs';
 })
 export class PlaceDetailPage implements OnInit, OnDestroy {
   discoverPlace: Place;
+  isBookable = false; // allow us to display or not the bookable button 
   private placesSub: Subscription;
   constructor(
     // private router: Router,
@@ -28,7 +30,8 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
     private modalCtrl: ModalController,
     private laodingCtrl: LoadingController,
     private actionSheetCtrl: ActionSheetController,
-    private bookingService: BookingService
+    private bookingService: BookingService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -42,6 +45,7 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
         .getPlace(paramMap.get('placeId'))
         .subscribe((place) => {
           this.discoverPlace = place;
+          this.isBookable = place.userId !== this.authService.userId;
         });
     }); // listen the changes on the url
   }
