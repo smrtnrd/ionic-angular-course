@@ -4,48 +4,60 @@ import { Place } from './place.model';
 import { BehaviorSubject } from 'rxjs';
 import { take, map, tap, delay, switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+
+interface PlaceData {
+  availableFrom: string;
+  availableTo: string;
+  description: string;
+  imageUrl: string;
+  price: number;
+  title: string;
+  userId: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
+
 export class PlacesService {
-  private _places = new BehaviorSubject<Place[]>([
-    new Place(
-      'p1',
-      'Chateau Laurier',
-      'Le Fairmont Château Laurier est un hôtel cinq étoiles de grande renommée situé au cœur du centre-ville d\'Ottawa',
-      'https://ottawa2016aesatema.files.wordpress.com/2015/09/chateau-laurier-ottawa.jpg',
-      300,
-      new Date('2019-01-01'),
-      new Date('2019-12-31'),
-      'abc'
-    ),
-    new Place(
-      'p2',
-      'Ottawa Jail Hostel',
-      'Located in downtown Ottawa, the HI Ottawa Jail Hostel is within easy walking distance of Parliament Hill, the Byward Market and all the major downtown attractions.',
-      'https://res.cloudinary.com/hostelling-internation/image/upload/t_hostel_carousel/f_auto,q_auto/v1557521382/nzzomycdvyg3ixrmmokw.jpg',
-      78,
-      new Date('2019-01-01'),
-      new Date('2019-12-31'),
-      'abc'
-    ),
-    new Place(
-      'p3',
-      'The Westin Ottawa',
-      'No matter your reason for visiting Ontario, Canada, whether business or leisure, The Westin Ottawa is dedicated to making your stay in downtown Ottawa',
-      'https://postmediaottawacitizen2.files.wordpress.com/2017/01/the-westin-ottawa-gave-its-customers-this-picture-as-a-thank.jpeg?quality=100&strip=all&w=564',
-      198.99,
-      new Date('2019-01-01'),
-      new Date('2019-12-31'),
-      'abc'
-    ),
-  ]);
+  private _places = new BehaviorSubject<Place[]>([]);
+  constructor(private authService: AuthService, private http: HttpClient) {}
 
   get places() {
     return this._places.asObservable();
   }
 
-  constructor(private authService: AuthService, private http: HttpClient) {}
+  fetchPlaces() {
+    return this.http
+    .get<{[key: string]: PlaceData }>('https://ionic-angular-course-c7a6c.firebaseio.com/offered-places.json')
+    .pipe(map( resData => {
+      const places = [];
+      for (const key in resData) {
+        if(resData.hasOwnProperty(key)) {
+          places.push(
+            new Place(
+              key,
+              resData[key].title,
+              resData[key].description,
+              resData[key].imageUrl,
+              resData[key].price,
+              new Date(resData[key].availableFrom),
+              new Date(resData[key].availableTo),
+              resData[key].userId
+            )
+          );
+        }
+      }
+      return places;
+    }),
+    tap(places => {
+      this._places.next(places);
+    })
+    );
+  }
+
+  // map return non observable data
+  // switchmap return observable data
 
   getPlace(id: string) {
     return this.places.pipe(
@@ -156,3 +168,37 @@ export class PlacesService {
     // this.places.push(newPlace);
   }
 }
+
+
+// [
+//   new Place(
+//     'p1',
+//     'Chateau Laurier',
+//     'Le Fairmont Château Laurier est un hôtel cinq étoiles de grande renommée situé au cœur du centre-ville d\'Ottawa',
+//     'https://ottawa2016aesatema.files.wordpress.com/2015/09/chateau-laurier-ottawa.jpg',
+//     300,
+//     new Date('2019-01-01'),
+//     new Date('2019-12-31'),
+//     'abc'
+//   ),
+//   new Place(
+//     'p2',
+//     'Ottawa Jail Hostel',
+//     'Located in downtown Ottawa, the HI Ottawa Jail Hostel is within easy walking distance of Parliament Hill, the Byward Market and all the major downtown attractions.',
+//     'https://res.cloudinary.com/hostelling-internation/image/upload/t_hostel_carousel/f_auto,q_auto/v1557521382/nzzomycdvyg3ixrmmokw.jpg',
+//     78,
+//     new Date('2019-01-01'),
+//     new Date('2019-12-31'),
+//     'abc'
+//   ),
+//   new Place(
+//     'p3',
+//     'The Westin Ottawa',
+//     'No matter your reason for visiting Ontario, Canada, whether business or leisure, The Westin Ottawa is dedicated to making your stay in downtown Ottawa',
+//     'https://postmediaottawacitizen2.files.wordpress.com/2017/01/the-westin-ottawa-gave-its-customers-this-picture-as-a-thank.jpeg?quality=100&strip=all&w=564',
+//     198.99,
+//     new Date('2019-01-01'),
+//     new Date('2019-12-31'),
+//     'abc'
+//   ),
+// ]

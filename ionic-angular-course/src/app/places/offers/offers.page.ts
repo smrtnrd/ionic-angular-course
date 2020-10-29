@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 })
 export class OffersPage implements OnInit, OnDestroy {
   loadedOffers: Place[];
+  isLoading = false;
   placesSubs: Subscription;
 
   constructor( private placesService: PlacesService, private router: Router) { }
@@ -23,6 +24,12 @@ export class OffersPage implements OnInit, OnDestroy {
     // this.loadedOffers = this.placesService.places;
   }
 
+  ionViewWillEnter(){
+    this.isLoading = true;
+    this.placesService.fetchPlaces().subscribe(() => {
+      this.isLoading = false;
+    });
+  }
   ngOnDestroy()  {
     if  (this.placesSubs) {
       this.placesSubs.unsubscribe();
