@@ -89,7 +89,7 @@ export class BookingService {
 
     return this.http
       .post<{ name: string }>(
-        "https://ionic-angular-course-c7a6c.firebaseio.com/booked-places.json",
+        'https://ionic-angular-course-c7a6c.firebaseio.com/booked-places.json',
         { ...newBooking, id: null }
       )
       .pipe(
@@ -108,9 +108,12 @@ export class BookingService {
   }
 
   cancelBooking(bookingId: string) {
-    return this.bookings.pipe(
+    return this.http.delete(`https://ionic-angular-course-c7a6c.firebaseio.com/booked-places/${bookingId}.json`)
+    .pipe(
+      switchMap(() => {
+        return this.bookings;
+      }),
       take(1),
-      delay(1000),
       tap((bookings) => {
         setTimeout(() => {
           this._bookings.next(bookings.filter((b) => b.id !== bookingId)); // filter out the bookingid  that  we don't want
