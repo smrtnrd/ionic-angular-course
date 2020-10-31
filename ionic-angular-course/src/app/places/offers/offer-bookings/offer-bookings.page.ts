@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 })
 export class OfferBookingsPage implements OnInit, OnDestroy {
   place: Place;
+  isLoading = false;
   private placesSub: Subscription;
 
   constructor(
@@ -26,8 +27,10 @@ export class OfferBookingsPage implements OnInit, OnDestroy {
         this.navCtrl.navigateBack('/places/tabs/offers');
         return;
       }
+      this.isLoading=true;
       this.placesSub = this.placesService.getPlace(paramMap.get('placeId')).subscribe(place  => {
         this.place = place;
+        this.isLoading = false;
         console.log('Offer Booking: PlaceID: ', paramMap.get('placeId'));
       });
     }); // listen the changes on the url

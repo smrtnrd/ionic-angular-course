@@ -1,12 +1,13 @@
 import { AuthService } from './../../../auth/auth.service';
 import { BookingService } from './../../../bookings/booking.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   NavController,
   ModalController,
   ActionSheetController,
   LoadingController,
+  AlertController,
 } from '@ionic/angular';
 import { PlacesService } from '../../places.service';
 import { Place } from '../../place.model';
@@ -20,7 +21,8 @@ import { Subscription } from 'rxjs';
 })
 export class PlaceDetailPage implements OnInit, OnDestroy {
   discoverPlace: Place;
-  isBookable = false; // allow us to display or not the bookable button 
+  isLoading = false;
+  isBookable = false; // allow us to display or not the bookable button
   private placesSub: Subscription;
   constructor(
     // private router: Router,
@@ -31,7 +33,9 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
     private laodingCtrl: LoadingController,
     private actionSheetCtrl: ActionSheetController,
     private bookingService: BookingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private alertCtrl: AlertController,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -41,12 +45,32 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
         this.navCtrl.navigateBack('/places/tabs/discover');
         return;
       }
+      this.isLoading = true; // laoding the page
       this.placesSub = this.placesService
         .getPlace(paramMap.get('placeId'))
         .subscribe((place) => {
           this.discoverPlace = place;
           this.isBookable = place.userId !== this.authService.userId;
-        });
+          this.isLoading = false;
+        }, 
+        (error) => {
+          console.log(error);
+          this.alertCtrl.create({
+            header: 'an error occured',
+            message: 'Place could not be fetched. Please try again later',
+            buttons: [
+              {
+                text: 'Okay',
+                handler: () => {
+                  this.router.navigate(['places/tabs/discover']);
+                },
+              },
+            ],
+          }).then(alertEl => {
+            alertEl.present();
+          });
+        }
+        );
     }); // listen the changes on the url
   }
 
@@ -107,24 +131,25 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
         console.log(resultData.data, resultData.role);
         if (resultData.role === 'confirm') {
           this.laodingCtrl
-          .create({ message: 'Booking place ...'})
-          .then( loandingEl => {
-            loandingEl.present();
-            const data = resultData.data.bookingData;
-            this.bookingService.addBooking(
-            this.discoverPlace.id,
-            this.discoverPlace.title,
-            this.discoverPlace.imageUrl,
-            data.firstName,
-            data.lastName,
-            data.guestNumber,
-            data.startDate,
-            data.endDate
-          )
-          .subscribe(() => {
-            loandingEl.dismiss();
-          });
-          });
+            .create({ message: 'Booking place ...' })
+            .then((loandingEl) => {
+              loandingEl.present();
+              const data = resultData.data.bookingData;
+              this.bookingService
+                .addBooking(
+                  this.discoverPlace.id,
+                  this.discoverPlace.title,
+                  this.discoverPlace.imageUrl,
+                  data.firstName,
+                  data.lastName,
+                  data.guestNumber,
+                  data.startDate,
+                  data.endDate
+                )
+                .subscribe(() => {
+                  loandingEl.dismiss();
+                });
+            });
           // console.log('BOOKED');
         }
       });

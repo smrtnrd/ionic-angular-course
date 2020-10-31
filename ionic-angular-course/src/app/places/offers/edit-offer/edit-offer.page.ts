@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Place } from '../../place.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NavController, LoadingController } from '@ionic/angular';
+import { NavController, LoadingController, AlertController } from '@ionic/angular';
 import { PlacesService } from '../../places.service';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -13,15 +13,18 @@ import { Subscription } from 'rxjs';
 })
 export class EditOfferPage implements OnInit, OnDestroy {
   place: Place;
+  placeId: string;
   form: FormGroup;
+  isLoading = false;
   private placesSub: Subscription;
 
   constructor(
     private route: ActivatedRoute,
-    private placesService: PlacesService,
     private router: Router,
+    private placesService: PlacesService,
     private laodingCtrl: LoadingController,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private alertCtrl: AlertController
   ) {}
 
   ngOnInit() {
@@ -30,24 +33,46 @@ export class EditOfferPage implements OnInit, OnDestroy {
         this.navCtrl.navigateBack('/places/tabs/offers');
         return;
       }
+      this.placeId = paramMap.get('placeId');
+      this.isLoading = true;
       this.placesSub = this.placesService
         .getPlace(paramMap.get('placeId'))
-        .subscribe((place) => {
-          // get the data from the specific id
-          this.place = place;
-          console.log('PlaceID: ', paramMap.get('placeId'));
-        });
-      // Reactive Form
-      this.form = new FormGroup({
-        title: new FormControl(this.place.title, {
-          updateOn: 'blur',
-          validators: [Validators.required],
-        }),
-        description: new FormControl(this.place.description, {
-          updateOn: 'blur',
-          validators: [Validators.required, Validators.maxLength(180)],
-        }),
-      });
+        .subscribe(
+          (place) => {
+            // get the data from the specific id
+            this.place = place;
+            this.form = new FormGroup({
+              // Reactive Form
+              title: new FormControl(this.place.title, {
+                updateOn: 'blur',
+                validators: [Validators.required],
+              }),
+              description: new FormControl(this.place.description, {
+                updateOn: 'blur',
+                validators: [Validators.required, Validators.maxLength(180)],
+              }),
+            });
+            this.isLoading = false;
+            console.log('2 Editing Item: ', paramMap.get('placeId'));
+          },
+          (error) => {
+            console.log(error);
+            this.alertCtrl.create({
+              header: 'an error occured',
+              message: 'Place could not be fetched. Please try again later',
+              buttons: [
+                {
+                  text: 'Okay',
+                  handler: () => {
+                    this.router.navigate(['places/tabs/offers']);
+                  },
+                },
+              ],
+            }).then(alertEl => {
+              alertEl.present();
+            });
+          }
+        );
     });
   }
 
