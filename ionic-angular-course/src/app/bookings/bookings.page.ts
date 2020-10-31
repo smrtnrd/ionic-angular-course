@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./bookings.page.scss'],
 })
 export class BookingsPage implements OnInit, OnDestroy {
+  isLoading = false;
   loadedBookings: Booking[];
   bookingSubs: Subscription;
 
@@ -18,6 +19,13 @@ export class BookingsPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.bookingSubs = this.bookingService.bookings.subscribe(bookings => {
       this.loadedBookings = bookings;
+    });
+  }
+
+  ionViewWillEnter() {
+    this.isLoading = true;
+    this.bookingService.fetchBookings().subscribe(() => {
+      this.isLoading = false;
     });
   }
 
@@ -33,8 +41,8 @@ export class BookingsPage implements OnInit, OnDestroy {
       this.bookingService.cancelBooking(bookingId).subscribe(() => {
         loadingEl.dismiss();
       });
-    })
-    
+    });
+
     slidingEl.close();
     // cancel booking -> delete page
   }

@@ -16,7 +16,7 @@ interface PlaceData {
 }
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class PlacesService {
   private _places = new BehaviorSubject<Place[]>([]);
@@ -29,7 +29,7 @@ export class PlacesService {
   fetchPlaces() {
     return this.http
       .get<{ [key: string]: PlaceData }>(
-        "https://ionic-angular-course-c7a6c.firebaseio.com/offered-places.json"
+        'https://ionic-angular-course-c7a6c.firebaseio.com/offered-places.json'
       )
       .pipe(
         map((resData) => {
@@ -105,7 +105,7 @@ export class PlacesService {
           const place = places.find((p) => p.id === id);
           place.title = title;
           place.description = description;
-          console.log("editPlace", place);
+          console.log('editPlace', place);
           return place;
         }, 1000);
       })
@@ -183,7 +183,7 @@ export class PlacesService {
       Math.random().toString(),
       title,
       description,
-      "https://ottawa2016aesatema.files.wordpress.com/2015/09/chateau-laurier-ottawa.jpg",
+      'https://ottawa2016aesatema.files.wordpress.com/2015/09/chateau-laurier-ottawa.jpg',
       price,
       dateFrom,
       dateTo,
@@ -191,7 +191,7 @@ export class PlacesService {
     );
     return this.http
       .post<{ name: string }>(
-        "https://ionic-angular-course-c7a6c.firebaseio.com/offered-places.json",
+        'https://ionic-angular-course-c7a6c.firebaseio.com/offered-places.json',
         {
           ...newPlace,
           id: null,
